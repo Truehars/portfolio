@@ -28,8 +28,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="light-mode">
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-to-content">Skip to content</a>
+    
     <!-- Background Overlay -->
-    <div class="bg-overlay">
+    <div class="bg-overlay" aria-hidden="true">
         <div class="bg-image active">
             <img src="images/background/bg1.jpg" alt="Developer Background 1">
         </div>
@@ -45,12 +48,12 @@
     </div>
 
     <!-- Header Section -->
-    <header>
+    <header role="banner">
         <div class="container">
             <div class="logo">
                 <a href="#">Harshit<span>Verma</span></a>
             </div>
-            <nav class="desktop-nav">
+            <nav class="desktop-nav" role="navigation" aria-label="Main navigation">
                 <ul>
                     <li><a href="#home" class="active">Home</a></li>
                     <li><a href="#about">About</a></li>
@@ -62,11 +65,11 @@
                     <li><a href="#contact">Contact</a></li>
                 </ul>
             </nav>
-            <div class="theme-toggle">
-                <i class="fas fa-moon"></i>
-                <i class="fas fa-sun"></i>
+            <div class="theme-toggle" role="button" tabindex="0" aria-label="Toggle dark mode">
+                <i class="fas fa-moon" aria-hidden="true"></i>
+                <i class="fas fa-sun" aria-hidden="true"></i>
             </div>
-            <div class="hamburger">
+            <div class="hamburger" role="button" tabindex="0" aria-label="Toggle mobile menu" aria-expanded="false">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -75,7 +78,7 @@
     </header>
 
     <!-- Mobile Navigation -->
-    <div class="mobile-nav">
+    <div class="mobile-nav" role="navigation" aria-label="Mobile navigation">
         <ul>
             <li><a href="#home" class="active">Home</a></li>
             <li><a href="#about">About</a></li>
@@ -89,33 +92,35 @@
     </div>
 
     <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <h1>Hi, I'm <span>Harshit Verma</span></h1>
-                    <h2 class="typing-text">Web Developer</h2>
-                    <p>I create stunning digital experiences that make an impact.</p>
-                    <div class="hero-buttons">
-                        <a href="#contact" class="btn primary-btn">Hire Me</a>
-                        <a href="#projects" class="btn secondary-btn">View My Work</a>
+    <main id="main-content">
+        <section id="home" class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1>Hi, I'm <span>Harshit Verma</span></h1>
+                        <h2 class="typing-text">Web Developer</h2>
+                        <p>I create stunning digital experiences that make an impact.</p>
+                        <div class="hero-buttons">
+                            <a href="#contact" class="btn primary-btn">Hire Me</a>
+                            <a href="#projects" class="btn secondary-btn">View My Work</a>
+                        </div>
+                        <div class="social-icons" aria-label="Social media links">
+                            <a href="https://www.linkedin.com/in/harshit-verma-4684ba260" target="_blank" rel="noopener" aria-label="LinkedIn Profile" class="linkedin"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+                            <a href="https://github.com/Truehars" target="_blank" rel="noopener" aria-label="GitHub Profile" class="github"><i class="fab fa-github" aria-hidden="true"></i></a>
+                            <a href="https://x.com/varma789ajay" target="_blank" rel="noopener" aria-label="Twitter Profile" class="twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+                            <a href="https://www.instagram.com/harshit_verm__a?igsh=aXBmMnFnYTZ4MG94" target="_blank" rel="noopener" aria-label="Instagram Profile" class="instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                        </div>
                     </div>
-                    <div class="social-icons">
-                        <a href="https://www.linkedin.com/in/harshit-verma-4684ba260" target="_blank"><i class="fab fa-linkedin"></i></a>
-                        <a href="https://github.com/Truehars" target="_blank"><i class="fab fa-github"></i></a>
-                        <a href="https://x.com/varma789ajay" target="_blank"><i class="fab fa-twitter"></i></a>
-                        <a href="https://www.instagram.com/harshit_verm__a?igsh=aXBmMnFnYTZ4MG94" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <div class="hero-image">
+                        <img src="images/profile.jpg" alt="Harshit Verma">
                     </div>
-                </div>
-                <div class="hero-image">
-                    <img src="images/profile.jpg" alt="Harshit Verma">
                 </div>
             </div>
-        </div>
-        <div class="scroll-down">
-            <a href="#about"><i class="fas fa-chevron-down"></i></a>
-        </div>
-    </section>
+            <div class="scroll-down">
+                <a href="#about"><i class="fas fa-chevron-down"></i></a>
+            </div>
+        </section>
+    </main>
 
     <!-- About Section -->
     <section id="about" class="about glass-effect">
@@ -649,10 +654,10 @@
                     <div class="contact-social">
                         <h3>Follow Me</h3>
                         <div class="social-icons">
-                            <a href="https://www.linkedin.com/in/harshit-verma-4684ba260" target="_blank"><i class="fab fa-linkedin"></i></a>
-                            <a href="https://github.com/Truehars" target="_blank"><i class="fab fa-github"></i></a>
-                            <a href="https://x.com/varma789ajay" target="_blank"><i class="fab fa-twitter"></i></a>
-                            <a href="https://www.instagram.com/harshit_verm__a?igsh=aXBmMnFnYTZ4MG94" target="_blank"><i class="fab fa-instagram"></i></a>
+                            <a href="https://www.linkedin.com/in/harshit-verma-4684ba260" target="_blank" rel="noopener" aria-label="LinkedIn Profile" class="linkedin"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+                            <a href="https://github.com/Truehars" target="_blank" rel="noopener" aria-label="GitHub Profile" class="github"><i class="fab fa-github" aria-hidden="true"></i></a>
+                            <a href="https://x.com/varma789ajay" target="_blank" rel="noopener" aria-label="Twitter Profile" class="twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+                            <a href="https://www.instagram.com/harshit_verm__a?igsh=aXBmMnFnYTZ4MG94" target="_blank" rel="noopener" aria-label="Instagram Profile" class="instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
                         </div>
                     </div>
                 </div>
@@ -678,7 +683,7 @@
     </section>
 
     <!-- Footer -->
-    <footer>
+    <footer role="contentinfo">
         <div class="container">
             <div class="footer-content">
                 <p>&copy; 2023 Harshit Verma. All Rights Reserved.</p>
