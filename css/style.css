@@ -191,6 +191,7 @@ header {
     box-shadow: var(--shadow);
     padding: 20px 0;
     transition: var(--transition);
+    height: auto;
 }
 
 header.sticky {
@@ -347,7 +348,7 @@ header .container {
 
 /* ===== HERO SECTION ===== */
 .hero {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     padding-top: 80px;
@@ -358,6 +359,7 @@ header .container {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding-top: 60px;
 }
 
 .hero-text {
@@ -1242,6 +1244,7 @@ footer {
     
     .hero-content {
         flex-direction: column;
+        padding-top: 70px;
     }
     
     .hero-text {
@@ -1320,6 +1323,15 @@ footer {
     
     .hamburger {
         display: block;
+    }
+    
+    .hero {
+        padding-top: 60px;
+        padding-bottom: 60px;
+    }
+    
+    .hero-content {
+        padding-top: 100px;
     }
     
     .projects-grid {
@@ -1420,6 +1432,17 @@ footer {
     textarea:focus {
         outline: 3px solid var(--primary-color);
         outline-offset: 3px;
+    }
+    
+    /* Ensure all sections have proper spacing from the header */
+    section {
+        padding-top: 100px;
+        padding-bottom: 80px;
+    }
+    
+    /* Adjust scroll behavior for anchor links */
+    html {
+        scroll-padding-top: 70px; /* This ensures anchors don't scroll under the fixed header */
     }
 }
 
@@ -2107,4 +2130,55 @@ textarea:focus-visible,
 
 .skip-to-content:focus {
     top: 0;
+}
+
+/* Fix for header covering content on mobile */
+main {
+    padding-top: 20px;
+}
+
+#main-content {
+    scroll-margin-top: 80px; /* Ensures that when navigating to anchors, content isn't hidden under the header */
+}
+
+@media screen and (max-width: 768px) {
+    #main-content {
+        scroll-margin-top: 60px;
+    }
+    
+    /* Adjust section padding for better mobile spacing */
+    section {
+        padding: 80px 0;
+    }
+    
+    /* Ensure the hero section has enough space at the top */
+    .hero {
+        padding-top: 60px;
+    }
+}
+
+/* Mobile header and content fixes */
+@media screen and (max-width: 768px) {
+    header {
+        padding: 10px 0;
+    }
+    
+    .logo a {
+        font-size: 24px; /* Smaller logo on mobile */
+    }
+    
+    /* Adjust first section to account for fixed header */
+    #home {
+        margin-top: 60px;
+    }
+    
+    /* Ensure all anchor links account for fixed header */
+    :target {
+        scroll-margin-top: 70px;
+    }
+    
+    /* Adjust all section IDs to account for fixed header */
+    #about, #skills, #projects, #experience, #certifications, #services, #contact {
+        scroll-margin-top: 70px;
+    }
 } 
