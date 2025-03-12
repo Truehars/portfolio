@@ -1,29 +1,38 @@
 # Harshit Verma - Portfolio Website
 
-A modern, responsive portfolio website for Harshit Verma, showcasing his skills, projects, experience, and services.
+A modern, responsive portfolio website showcasing my skills, projects, and professional experience.
 
 ## Features
 
-- **Responsive Design**: Looks great on all devices (desktop, tablet, mobile)
-- **Modern UI**: Clean and professional design with smooth animations
-- **Dark/Light Mode**: Toggle between dark and light themes
-- **Interactive Elements**:
-  - Animated skill bars
-  - Project filtering
-  - Smooth scrolling navigation
-  - Interactive timeline for experience
-  - Testimonial slider
-  - Typing animation effect
-  - Hover effects on project cards
-- **Contact Form**: Functional contact form for potential clients to reach out
+- Responsive design that works on all devices
+- Dark/Light mode toggle
+- Animated background with rotating images
+- Interactive project filtering
+- Skills visualization with progress bars
+- Tabbed sections for education and work experience
+- Contact form
+- Social media integration
 
 ## Technologies Used
 
 - HTML5
-- CSS3 (with CSS Variables for theming)
-- JavaScript (Vanilla JS, no frameworks)
-- Font Awesome Icons
+- CSS3
+- JavaScript
+- Font Awesome icons
 - Google Fonts
+
+## Preview
+
+Visit the live website: [Harshit Verma Portfolio](https://truehars.github.io/portfolio/)
+
+## Contact
+
+Feel free to reach out to me:
+- Email: varma789ajay@gmail.com
+- LinkedIn: [Harshit Verma](https://www.linkedin.com/in/harshit-verma-4684ba260)
+- GitHub: [Truehars](https://github.com/Truehars)
+- Twitter: [@varma789ajay](https://x.com/varma789ajay)
+- Instagram: [@harshit_verm__a](https://www.instagram.com/harshit_verm__a?igsh=aXBmMnFnYTZ4MG94)
 
 ## Project Structure
 
