@@ -1261,10 +1261,42 @@ footer {
     .about-image {
         padding-right: 0;
         margin-bottom: 50px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .about-image img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .about-text {
+        width: 100%;
+        padding: 0;
+    }
+    
+    .about-text h3 {
+        font-size: 28px;
+        text-align: center;
     }
     
     .personal-info {
         grid-template-columns: 1fr;
+    }
+    
+    .info-item {
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+    
+    .info-item span {
+        width: 100%;
+        margin-bottom: 5px;
+        display: block;
+    }
+    
+    .info-item p {
+        width: 100%;
     }
     
     .project-filters {
@@ -1359,6 +1391,28 @@ footer {
     .social-icons a {
         margin: 0 8px;
     }
+    
+    /* Fix about section text alignment on mobile */
+    .about-text p {
+        text-align: left;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .info-item {
+        display: block;
+        margin-bottom: 15px;
+    }
+    
+    .info-item span {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    
+    .info-item p {
+        margin: 0;
+    }
 }
 
 @media screen and (max-width: 576px) {
@@ -1430,6 +1484,36 @@ footer {
     .certifications-grid {
         grid-template-columns: 1fr;
     }
+    
+    /* Additional about section fixes for small screens */
+    .about-text h3 {
+        font-size: 24px;
+        text-align: left;
+        word-wrap: break-word;
+    }
+    
+    .about-text p {
+        font-size: 15px;
+        line-height: 1.6;
+    }
+    
+    .personal-info {
+        margin-top: 20px;
+    }
+    
+    .info-item {
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .about-text .btn {
+        width: 100%;
+        text-align: center;
+    }
 }
 
 /* Small mobile devices */
@@ -1452,6 +1536,17 @@ footer {
     
     .about-text h3 {
         font-size: 20px;
+        line-height: 1.4;
+    }
+    
+    .about-text p {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .info-item span, 
+    .info-item p {
+        font-size: 14px;
     }
     
     .project-info h3 {
