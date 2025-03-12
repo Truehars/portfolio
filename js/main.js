@@ -14,6 +14,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const typingText = document.querySelector('.typing-text');
     const contactForm = document.getElementById('contactForm');
     
+    // Detect if device is mobile
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // Add mobile class to body if on mobile device
+    if (isMobile) {
+        document.body.classList.add('is-mobile');
+    }
+    
     // Typing effect for hero section
     if (typingText) {
         const roles = ['Web Developer', 'UI/UX Designer', 'Frontend Developer', 'Freelancer'];
@@ -54,8 +62,15 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(typeEffect, 1000);
     }
     
-    // Sticky header
+    // Sticky header with throttling for better performance
+    let lastScrollTime = 0;
     window.addEventListener('scroll', function() {
+        const now = Date.now();
+        if (now - lastScrollTime < 50 && !isMobile) return; // Throttle scroll events on desktop
+        if (now - lastScrollTime < 150 && isMobile) return; // More aggressive throttling on mobile
+        
+        lastScrollTime = now;
+        
         if (window.scrollY > 50) {
             header.classList.add('sticky');
             backToTop.classList.add('active');
@@ -71,18 +86,45 @@ document.addEventListener('DOMContentLoaded', function() {
         highlightActiveSection();
     });
     
-    // Mobile navigation toggle
+    // Mobile navigation toggle with improved touch handling
     if (hamburger) {
-        hamburger.addEventListener('click', function() {
+        hamburger.addEventListener('click', function(e) {
+            e.preventDefault();
+            this.classList.toggle('active');
+            mobileNav.classList.toggle('active');
+            document.body.classList.toggle('no-scroll');
+        });
+        
+        // Add touch event for better mobile experience
+        hamburger.addEventListener('touchend', function(e) {
+            e.preventDefault();
             this.classList.toggle('active');
             mobileNav.classList.toggle('active');
             document.body.classList.toggle('no-scroll');
         });
     }
     
+    // Close mobile nav when clicking outside
+    document.addEventListener('click', function(e) {
+        if (mobileNav.classList.contains('active') && 
+            !mobileNav.contains(e.target) && 
+            !hamburger.contains(e.target)) {
+            hamburger.classList.remove('active');
+            mobileNav.classList.remove('active');
+            document.body.classList.remove('no-scroll');
+        }
+    });
+    
     // Close mobile nav when clicking a link
     navLinks.forEach(link => {
-        link.addEventListener('click', function() {
+        link.addEventListener('click', function(e) {
+            hamburger.classList.remove('active');
+            mobileNav.classList.remove('active');
+            document.body.classList.remove('no-scroll');
+        });
+        
+        // Add touch event for better mobile experience
+        link.addEventListener('touchend', function(e) {
             hamburger.classList.remove('active');
             mobileNav.classList.remove('active');
             document.body.classList.remove('no-scroll');
@@ -108,9 +150,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Tab functionality
+    // Tab functionality with improved touch handling
     tabBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
+        const handleTabClick = function(e) {
+            e.preventDefault();
             const target = this.getAttribute('data-target');
             const tabContent = this.closest('section').querySelector('.tab-pane#' + target) || 
                                document.querySelector('.tab-pane#' + target);
@@ -129,12 +172,16 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add active class to clicked button and corresponding pane
             this.classList.add('active');
             tabContent.classList.add('active');
-        });
+        };
+        
+        btn.addEventListener('click', handleTabClick);
+        btn.addEventListener('touchend', handleTabClick);
     });
     
-    // Project filtering
+    // Project filtering with improved touch handling
     filterBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
+        const handleFilterClick = function(e) {
+            e.preventDefault();
             const filter = this.getAttribute('data-filter');
             
             // Remove active class from all filter buttons
@@ -161,7 +208,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     }, 300);
                 }
             });
-        });
+        };
+        
+        btn.addEventListener('click', handleFilterClick);
+        btn.addEventListener('touchend', handleFilterClick);
     });
     
     // Animate skill bars when in viewport
@@ -179,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize skill bars animation
     setTimeout(animateSkillBars, 500);
     
-    // Smooth scrolling for anchor links
+    // Smooth scrolling for anchor links with improved mobile handling
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
@@ -189,8 +239,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const targetElement = document.querySelector(targetId);
             if (targetElement) {
+                // Adjust offset for mobile to account for smaller header
+                const offset = isMobile ? 60 : 80;
+                
                 window.scrollTo({
-                    top: targetElement.offsetTop - 80,
+                    top: targetElement.offsetTop - offset,
                     behavior: 'smooth'
                 });
             }
@@ -221,10 +274,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Testimonial slider
+    // Testimonial slider with touch support
     const testimonialItems = document.querySelectorAll('.testimonial-item');
     const testimonialDots = document.querySelector('.testimonial-dots');
     let currentSlide = 0;
+    let touchStartX = 0;
+    let touchEndX = 0;
     
     // Create dots for testimonial slider
     if (testimonialItems.length > 0 && testimonialDots) {
@@ -239,6 +294,34 @@ document.addEventListener('DOMContentLoaded', function() {
             
             testimonialDots.appendChild(dot);
         });
+        
+        // Add touch events for testimonial slider
+        const testimonialContainer = testimonialDots.closest('.testimonials');
+        if (testimonialContainer) {
+            testimonialContainer.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+            
+            testimonialContainer.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+        }
+    }
+    
+    // Handle swipe for testimonial slider
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        if (touchEndX < touchStartX - swipeThreshold) {
+            // Swipe left, go to next slide
+            currentSlide = (currentSlide + 1) % testimonialItems.length;
+            goToSlide(currentSlide);
+        }
+        if (touchEndX > touchStartX + swipeThreshold) {
+            // Swipe right, go to previous slide
+            currentSlide = (currentSlide - 1 + testimonialItems.length) % testimonialItems.length;
+            goToSlide(currentSlide);
+        }
     }
     
     // Function to show a specific slide
@@ -262,13 +345,15 @@ document.addEventListener('DOMContentLoaded', function() {
             item.style.transform = `translateX(${100 * index}%)`;
         });
         
-        // Auto slide
-        setInterval(() => {
-            if (testimonialItems.length > 1) {
-                currentSlide = (currentSlide + 1) % testimonialItems.length;
-                goToSlide(currentSlide);
-            }
-        }, 5000);
+        // Auto slide (disable on mobile to save battery)
+        if (!isMobile) {
+            setInterval(() => {
+                if (testimonialItems.length > 1) {
+                    currentSlide = (currentSlide + 1) % testimonialItems.length;
+                    goToSlide(currentSlide);
+                }
+            }, 5000);
+        }
     }
     
     // Contact form submission
@@ -302,63 +387,73 @@ document.addEventListener('DOMContentLoaded', function() {
         AOS.init({
             duration: 1000,
             once: true,
-            offset: 100
+            offset: 100,
+            disable: isMobile ? 'phone' : false // Disable on mobile for better performance
         });
     }
 
-    // Smooth parallax effect for hero section
-    window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset;
-        const heroImage = document.querySelector('.hero-image');
-        const heroText = document.querySelector('.hero-text');
-        
-        if (heroImage && heroText) {
-            heroImage.style.transform = `translateY(${scrolled * 0.4}px)`;
-            heroText.style.transform = `translateY(${scrolled * 0.2}px)`;
-        }
-    });
+    // Smooth parallax effect for hero section (disable on mobile for better performance)
+    if (!isMobile) {
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const heroImage = document.querySelector('.hero-image');
+            const heroText = document.querySelector('.hero-text');
+            
+            if (heroImage && heroText) {
+                heroImage.style.transform = `translateY(${scrolled * 0.4}px)`;
+                heroText.style.transform = `translateY(${scrolled * 0.2}px)`;
+            }
+        });
+    }
 
-    // Enhanced skill bars animation
-    const animateSkills = () => {
+    // Enhanced skill bars animation with IntersectionObserver for better performance
+    const animateSkillsWithObserver = () => {
         const skillBars = document.querySelectorAll('.skill-bar');
         
-        skillBars.forEach(bar => {
-            const progress = bar.querySelector('.skill-progress');
-            const percentage = progress.getAttribute('data-progress');
-            
+        if ('IntersectionObserver' in window) {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
+                        const progress = entry.target.querySelector('.skill-progress');
+                        const percentage = progress.getAttribute('data-progress');
                         progress.style.width = `${percentage}%`;
-                        progress.style.background = `linear-gradient(90deg, 
-                            var(--primary-color) 0%, 
-                            var(--secondary-color) 50%, 
-                            var(--primary-color) 100%)`;
-                        progress.style.backgroundSize = '200% 100%';
-                        observer.unobserve(bar);
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.5 });
+            }, { threshold: 0.2 });
             
-            observer.observe(bar);
-        });
+            skillBars.forEach(bar => {
+                observer.observe(bar);
+            });
+        } else {
+            // Fallback for browsers that don't support IntersectionObserver
+            animateSkillBars();
+        }
     };
 
-    // Smooth scroll with progress indicator
+    // Smooth scroll with progress indicator (simplified for mobile)
     const initSmoothScroll = () => {
         const progressIndicator = document.createElement('div');
         progressIndicator.className = 'scroll-progress';
         document.body.appendChild(progressIndicator);
 
+        // Throttled scroll event for better performance
+        let lastScrollUpdate = 0;
         window.addEventListener('scroll', () => {
+            const now = Date.now();
+            if (now - lastScrollUpdate < (isMobile ? 200 : 50)) return;
+            lastScrollUpdate = now;
+            
             const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
             const scrolled = (window.pageYOffset / windowHeight) * 100;
             progressIndicator.style.width = `${scrolled}%`;
         });
     };
 
-    // Enhanced project cards with tilt effect
+    // Enhanced project cards with tilt effect (disable on mobile)
     const initTiltEffect = () => {
+        if (isMobile) return; // Skip on mobile devices
+        
         const cards = document.querySelectorAll('.project-item');
         
         cards.forEach(card => {
@@ -391,11 +486,10 @@ document.addEventListener('DOMContentLoaded', function() {
             slider.addEventListener('touchstart', (e) => {
                 startX = e.touches[0].pageX;
                 isDragging = true;
-            });
+            }, { passive: true });
             
             slider.addEventListener('touchmove', (e) => {
                 if (!isDragging) return;
-                e.preventDefault();
                 const currentX = e.touches[0].pageX;
                 const diff = startX - currentX;
                 
@@ -407,73 +501,77 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     isDragging = false;
                 }
-            });
+            }, { passive: true });
             
             slider.addEventListener('touchend', () => {
                 isDragging = false;
-            });
+            }, { passive: true });
         }
     };
 
-    // Animated counter for statistics
+    // Animated counter for statistics with IntersectionObserver
     const animateCounters = () => {
         const counters = document.querySelectorAll('.counter');
         
-        counters.forEach(counter => {
-            const target = parseInt(counter.getAttribute('data-target'));
-            const duration = 2000; // 2 seconds
-            const step = target / (duration / 16); // 60fps
-            let current = 0;
-            
-            const updateCounter = () => {
-                current += step;
-                if (current < target) {
-                    counter.textContent = Math.floor(current);
-                    requestAnimationFrame(updateCounter);
-                } else {
-                    counter.textContent = target;
-                }
-            };
-            
+        if ('IntersectionObserver' in window) {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
+                        const counter = entry.target;
+                        const target = parseInt(counter.getAttribute('data-target'));
+                        const duration = isMobile ? 1000 : 2000; // Shorter duration on mobile
+                        const step = target / (duration / 16);
+                        let current = 0;
+                        
+                        const updateCounter = () => {
+                            current += step;
+                            if (current < target) {
+                                counter.textContent = Math.floor(current);
+                                requestAnimationFrame(updateCounter);
+                            } else {
+                                counter.textContent = target;
+                            }
+                        };
+                        
                         updateCounter();
                         observer.unobserve(counter);
                     }
                 });
             }, { threshold: 0.5 });
             
-            observer.observe(counter);
-        });
+            counters.forEach(counter => {
+                observer.observe(counter);
+            });
+        }
     };
 
     // Initialize enhanced features
     initSmoothScroll();
-    animateSkills();
+    animateSkillsWithObserver();
     initTiltEffect();
     enhanceTestimonialSlider();
     animateCounters();
 
-    // Add smooth transitions between sections
-    const sections = document.querySelectorAll('section');
-    sections.forEach(section => {
-        section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        
-        const observer = new IntersectionObserver((entries) => {
+    // Add smooth transitions between sections with IntersectionObserver
+    if ('IntersectionObserver' in window) {
+        const sections = document.querySelectorAll('section');
+        const sectionObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
+                    entry.target.classList.add('in-view');
                 } else {
-                    entry.target.style.opacity = '0';
-                    entry.target.style.transform = 'translateY(30px)';
+                    if (!isMobile) { // Keep sections visible on mobile for better performance
+                        entry.target.classList.remove('in-view');
+                    }
                 }
             });
         }, { threshold: 0.1 });
         
-        observer.observe(section);
-    });
+        sections.forEach(section => {
+            section.classList.add('section-transition');
+            sectionObserver.observe(section);
+        });
+    }
 
     // Background Image Rotation
     function initBackgroundRotation() {
@@ -489,10 +587,31 @@ document.addEventListener('DOMContentLoaded', function() {
             backgrounds[currentBg].classList.add('active');
         }
 
-        // Change background every 5 seconds
-        setInterval(rotateBackground, 5000);
+        // Change background every 5 seconds (longer interval on mobile to save battery)
+        const interval = isMobile ? 8000 : 5000;
+        setInterval(rotateBackground, interval);
     }
 
     // Initialize when DOM is loaded
     initBackgroundRotation();
+    
+    // Add CSS class for section transitions
+    const style = document.createElement('style');
+    style.textContent = `
+        .section-transition {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .section-transition.in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Add passive event listeners for better touch performance
+    document.addEventListener('touchstart', function() {}, { passive: true });
+    document.addEventListener('touchmove', function() {}, { passive: true });
+    document.addEventListener('wheel', function() {}, { passive: true });
 }); 

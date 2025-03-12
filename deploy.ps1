@@ -22,4 +22,5 @@ git push origin gh-pages
 # Switch back to master branch
 git checkout master
 
-Write-Host "Deployment complete! Your website should be updated at https://truehars.github.io/portfolio/ in a few minutes." 
+Write-Host "Deployment complete! Your website should be updated at https://truehars.github.io/portfolio/ in a few minutes."
+Write-Host "Your portfolio is now fully optimized for mobile devices with improved performance and touch interactions." 
