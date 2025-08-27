@@ -9,13 +9,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const skillBars = document.querySelectorAll('.skill-progress');
     const tabBtns = document.querySelectorAll('.tab-btn');
     const filterBtns = document.querySelectorAll('.filter-btn');
-    const projectItems = document.querySelectorAll('.project-item');
+    const projectItems = document.querySelectorAll('.project-card');
     const backToTop = document.querySelector('.back-to-top');
     const typingText = document.querySelector('.typing-text');
     const contactForm = document.getElementById('contactForm');
     
-    // Detect if device is mobile
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    // Detect if device is mobile using feature detection
+    const isMobile = window.matchMedia('(max-width: 768px)').matches || 'ontouchstart' in window;
     
     // Add mobile class to body if on mobile device
     if (isMobile) {
@@ -78,9 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
             header.classList.remove('sticky');
             backToTop.classList.remove('active');
         }
-        
-        // Animate skill bars when in viewport
-        animateSkillBars();
         
         // Highlight active section in navigation
         highlightActiveSection();
@@ -178,7 +175,9 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('touchend', handleTabClick);
     });
     
-    // Project filtering with improved touch handling
+    // Enhanced project filtering with animations
+    const projectCards = document.querySelectorAll('.project-card');
+    
     filterBtns.forEach(btn => {
         const handleFilterClick = function(e) {
             e.preventDefault();
@@ -190,21 +189,28 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add active class to clicked button
             this.classList.add('active');
             
-            // Filter projects
-            projectItems.forEach(item => {
-                const category = item.getAttribute('data-category');
+            // Filter project cards with staggered animation
+            let delay = 0;
+            projectCards.forEach((card, index) => {
+                const category = card.getAttribute('data-category');
                 
                 if (filter === 'all' || filter === category) {
-                    item.style.display = 'block';
                     setTimeout(() => {
-                        item.style.opacity = '1';
-                        item.style.transform = 'scale(1)';
-                    }, 100);
+                        card.style.display = 'block';
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(30px) scale(0.9)';
+                        
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0) scale(1)';
+                        }, 50);
+                    }, delay);
+                    delay += 100;
                 } else {
-                    item.style.opacity = '0';
-                    item.style.transform = 'scale(0.8)';
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(-30px) scale(0.9)';
                     setTimeout(() => {
-                        item.style.display = 'none';
+                        card.style.display = 'none';
                     }, 300);
                 }
             });
@@ -214,20 +220,30 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('touchend', handleFilterClick);
     });
     
-    // Animate skill bars when in viewport
-    function animateSkillBars() {
-        skillBars.forEach(bar => {
-            const barTop = bar.getBoundingClientRect().top;
-            const progress = bar.getAttribute('data-progress');
-            
-            if (barTop < window.innerHeight - 100) {
-                bar.style.width = progress + '%';
+    // Initialize project cards with transition styles
+    projectCards.forEach(card => {
+        card.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+    });
+    
+    // Initialize circular progress rings
+    const initSkillCircles = () => {
+        const skillCircles = document.querySelectorAll('.skill-circle');
+        skillCircles.forEach(circle => {
+            const progressRing = circle.querySelector('.progress-ring-circle');
+            if (progressRing) {
+                const radius = progressRing.r.baseVal.value;
+                const circumference = 2 * Math.PI * radius;
+                progressRing.style.strokeDasharray = circumference;
+                progressRing.style.strokeDashoffset = circumference;
             }
         });
-    }
+    };
     
-    // Initialize skill bars animation
-    setTimeout(animateSkillBars, 500);
+    // Initialize skill circles on load
+    initSkillCircles();
+    
+    // Initialize education journey animations
+    initEducationJourney();
     
     // Smooth scrolling for anchor links with improved mobile handling
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -299,11 +315,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const testimonialContainer = testimonialDots.closest('.testimonials');
         if (testimonialContainer) {
             testimonialContainer.addEventListener('touchstart', (e) => {
-                touchStartX = e.changedTouches[0].screenX;
+                touchStartX = e.changedTouches[0].clientX;
             }, { passive: true });
             
             testimonialContainer.addEventListener('touchend', (e) => {
-                touchEndX = e.changedTouches[0].screenX;
+                touchEndX = e.changedTouches[0].clientX;
                 handleSwipe();
             }, { passive: true });
         }
@@ -369,13 +385,20 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Simple validation
             if (!name || !email || !subject || !message) {
-                alert('Please fill in all fields');
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showNotification('Please enter a valid email address', 'error');
                 return;
             }
             
             // Here you would typically send the form data to a server
             // For demo purposes, we'll just show a success message
-            alert('Thank you for your message! I will get back to you soon.');
+            showNotification('Thank you for your message! I will get back to you soon.', 'success');
             
             // Reset form
             contactForm.reset();
@@ -392,9 +415,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Smooth parallax effect for hero section (disable on mobile for better performance)
+    // Smooth parallax effect for hero section with throttling
     if (!isMobile) {
+        let parallaxLastUpdate = 0;
         window.addEventListener('scroll', () => {
+            const now = Date.now();
+            if (now - parallaxLastUpdate < 16) return; // 60fps throttling
+            parallaxLastUpdate = now;
+            
             const scrolled = window.pageYOffset;
             const heroImage = document.querySelector('.hero-image');
             const heroText = document.querySelector('.hero-text');
@@ -403,31 +431,72 @@ document.addEventListener('DOMContentLoaded', function() {
                 heroImage.style.transform = `translateY(${scrolled * 0.4}px)`;
                 heroText.style.transform = `translateY(${scrolled * 0.2}px)`;
             }
-        });
+        }, { passive: true });
     }
 
-    // Enhanced skill bars animation with IntersectionObserver for better performance
+    // Enhanced circular skill animation with IntersectionObserver
     const animateSkillsWithObserver = () => {
-        const skillBars = document.querySelectorAll('.skill-bar');
+        const skillCircles = document.querySelectorAll('.skill-circle');
         
         if ('IntersectionObserver' in window) {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        const progress = entry.target.querySelector('.skill-progress');
-                        const percentage = progress.getAttribute('data-progress');
-                        progress.style.width = `${percentage}%`;
+                        const circle = entry.target;
+                        const percentage = parseInt(circle.getAttribute('data-progress'));
+                        const progressRing = circle.querySelector('.progress-ring-circle');
+                        
+                        if (progressRing) {
+                            const radius = progressRing.r.baseVal.value;
+                            const circumference = 2 * Math.PI * radius;
+                            const offset = circumference - (percentage / 100) * circumference;
+                            
+                            // Set initial state
+                            progressRing.style.strokeDasharray = circumference;
+                            progressRing.style.strokeDashoffset = circumference;
+                            progressRing.style.stroke = 'url(#gradient-' + Math.random().toString(36).substr(2, 9) + ')';
+                            
+                            // Create gradient for each circle
+                            const svg = progressRing.closest('svg');
+                            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                            const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+                            const gradientId = 'gradient-' + Math.random().toString(36).substr(2, 9);
+                            
+                            gradient.setAttribute('id', gradientId);
+                            gradient.setAttribute('x1', '0%');
+                            gradient.setAttribute('y1', '0%');
+                            gradient.setAttribute('x2', '100%');
+                            gradient.setAttribute('y2', '100%');
+                            
+                            const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                            stop1.setAttribute('offset', '0%');
+                            stop1.setAttribute('stop-color', 'var(--primary-color)');
+                            
+                            const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                            stop2.setAttribute('offset', '100%');
+                            stop2.setAttribute('stop-color', 'var(--accent-color)');
+                            
+                            gradient.appendChild(stop1);
+                            gradient.appendChild(stop2);
+                            defs.appendChild(gradient);
+                            svg.appendChild(defs);
+                            
+                            progressRing.style.stroke = `url(#${gradientId})`;
+                            
+                            // Animate the progress
+                            setTimeout(() => {
+                                progressRing.style.strokeDashoffset = offset;
+                            }, 200);
+                        }
+                        
                         observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.2 });
+            }, { threshold: 0.3 });
             
-            skillBars.forEach(bar => {
-                observer.observe(bar);
+            skillCircles.forEach(circle => {
+                observer.observe(circle);
             });
-        } else {
-            // Fallback for browsers that don't support IntersectionObserver
-            animateSkillBars();
         }
     };
 
@@ -477,37 +546,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
-    // Enhanced testimonial slider with touch support
-    const enhanceTestimonialSlider = () => {
-        const slider = document.querySelector('.testimonial-slider');
-        let startX, isDragging = false;
-        
-        if (slider) {
-            slider.addEventListener('touchstart', (e) => {
-                startX = e.touches[0].pageX;
-                isDragging = true;
-            }, { passive: true });
-            
-            slider.addEventListener('touchmove', (e) => {
-                if (!isDragging) return;
-                const currentX = e.touches[0].pageX;
-                const diff = startX - currentX;
-                
-                if (Math.abs(diff) > 50) {
-                    if (diff > 0) {
-                        nextSlide();
-                    } else {
-                        prevSlide();
-                    }
-                    isDragging = false;
-                }
-            }, { passive: true });
-            
-            slider.addEventListener('touchend', () => {
-                isDragging = false;
-            }, { passive: true });
+    // Navigation functions for testimonial slider
+    function nextSlide() {
+        if (testimonialItems.length > 0) {
+            currentSlide = (currentSlide + 1) % testimonialItems.length;
+            goToSlide(currentSlide);
         }
-    };
+    }
+    
+    function prevSlide() {
+        if (testimonialItems.length > 0) {
+            currentSlide = (currentSlide - 1 + testimonialItems.length) % testimonialItems.length;
+            goToSlide(currentSlide);
+        }
+    }
 
     // Animated counter for statistics with IntersectionObserver
     const animateCounters = () => {
@@ -549,8 +601,34 @@ document.addEventListener('DOMContentLoaded', function() {
     initSmoothScroll();
     animateSkillsWithObserver();
     initTiltEffect();
-    enhanceTestimonialSlider();
     animateCounters();
+    initEducationJourney();
+    
+    // Education Journey Animation
+    function initEducationJourney() {
+        const progressFill = document.querySelector('.progress-fill');
+        if (progressFill) {
+            const targetProgress = progressFill.getAttribute('data-progress');
+            
+            // Animate progress bar when education tab is active
+            const educationTab = document.querySelector('[data-target="education"]');
+            if (educationTab) {
+                const animateProgress = () => {
+                    setTimeout(() => {
+                        progressFill.style.width = targetProgress + '%';
+                    }, 500);
+                };
+                
+                // Animate on page load if education tab is active
+                if (educationTab.classList.contains('active')) {
+                    animateProgress();
+                }
+                
+                // Animate when education tab is clicked
+                educationTab.addEventListener('click', animateProgress);
+            }
+        }
+    }
 
     // Add smooth transitions between sections with IntersectionObserver
     if ('IntersectionObserver' in window) {
@@ -579,7 +657,9 @@ document.addEventListener('DOMContentLoaded', function() {
         let currentBg = 0;
         
         // Make sure the first background is active immediately
-        backgrounds[0].classList.add('active');
+        if (backgrounds.length > 0) {
+            backgrounds[0].classList.add('active');
+        }
         
         function rotateBackground() {
             backgrounds[currentBg].classList.remove('active');
@@ -610,8 +690,54 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.head.appendChild(style);
     
-    // Add passive event listeners for better touch performance
-    document.addEventListener('touchstart', function() {}, { passive: true });
-    document.addEventListener('touchmove', function() {}, { passive: true });
-    document.addEventListener('wheel', function() {}, { passive: true });
+    // Notification system to replace alerts
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+        
+        // Add styles
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            max-width: 300px;
+            word-wrap: break-word;
+        `;
+        
+        // Set background color based on type
+        const colors = {
+            success: '#4CAF50',
+            error: '#f44336',
+            info: '#2196F3'
+        };
+        notification.style.backgroundColor = colors[type] || colors.info;
+        
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+            notification.style.opacity = '1';
+            notification.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Remove after 4 seconds
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 4000);
+    }
 }); 
