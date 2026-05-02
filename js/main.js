@@ -690,6 +690,57 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.head.appendChild(style);
     
+    // EmailJS initialization and contact form handling
+    function initEmailJS() {
+        // Initialize EmailJS with your public key
+        if (typeof emailjs !== 'undefined') {
+            emailjs.init("7el98vQqvYUQelvrB");
+            
+            const contactForm = document.getElementById("contactForm");
+            if (contactForm) {
+                // Set current time in hidden input
+                const timeField = document.getElementById("time");
+                if (timeField) {
+                    timeField.value = new Date().toLocaleString();
+                }
+                
+                contactForm.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    
+                    // Update time before sending
+                    if (timeField) {
+                        timeField.value = new Date().toLocaleString();
+                    }
+                    
+                    // Show loading state
+                    const submitBtn = contactForm.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = 'Sending...';
+                    submitBtn.disabled = true;
+                    
+                    // Send form using EmailJS
+                    emailjs.sendForm("service_mxk6un3", "template_logpkcg", "#contactForm")
+                        .then(function (response) {
+                            console.log("SUCCESS!", response.status, response.text);
+                            showNotification("Message sent successfully! I'll get back to you soon.", 'success');
+                            contactForm.reset();
+                        }, function (error) {
+                            console.log("FAILED...", error);
+                            showNotification("Failed to send message. Please try again.", 'error');
+                        })
+                        .finally(() => {
+                            // Reset button state
+                            submitBtn.textContent = originalText;
+                            submitBtn.disabled = false;
+                        });
+                });
+            }
+        }
+    }
+    
+    // Initialize EmailJS
+    initEmailJS();
+
     // Notification system to replace alerts
     function showNotification(message, type = 'info') {
         const notification = document.createElement('div');
